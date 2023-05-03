@@ -14,7 +14,9 @@ secret = token.splitlines()
 # engine = db.create_engine(f"mysql+mysqlconnector://{secret[0]}:{secret[1]}@localhost:3306/{basedir / 'database.db'}", pool_pre_ping=True)
 engine = db.create_engine(f"sqlite:////{basedir / 'database.db'}")
 metadata = db.MetaData()
-connection = engine.connect()
+
+
+# connection = engine.connect()
 
 def check_hookup_data():
     create_table = db.Table('transaction',
@@ -24,11 +26,13 @@ def check_hookup_data():
                             db.Column('date', db.Integer()),
                             db.Column('amt', db.Integer()),
                             )
-    #  So this line was throwing the error when I use mysql, but this should be possible in Sqlite
+    #  So this line was throwing the error when I use mysql, but works with Sqlite
     metadata.create_all(engine, checkfirst=True)
-    return create_table
 
 
-table = check_hookup_data()
-engine.begin()
-
+#     return create_table
+#
+#
+# table = check_hookup_data()
+check_hookup_data()
+# engine.begin()
