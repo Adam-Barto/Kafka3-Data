@@ -19,6 +19,7 @@ class XactionConsumer:
         # THE PROBLEM is every time we re-run the Consumer, ALL our customer
         # data gets lost!
         # add a way to connect to your database here.
+
         self.connection = engine.connect()
         self.metadata = db.MetaData()
         self.table = db.Table('transaction',

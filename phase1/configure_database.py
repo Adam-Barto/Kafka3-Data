@@ -18,6 +18,7 @@ metadata = db.MetaData()
 
 # connection = engine.connect()
 
+
 def check_hookup_data():
     create_table = db.Table('transaction',
                             metadata,
