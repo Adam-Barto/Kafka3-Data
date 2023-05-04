@@ -1,14 +1,13 @@
 from kafka import KafkaConsumer, TopicPartition
 from json import loads
-from configure_database import db, engine
-
+from configure_database import session, trans_schema
 
 class XactionConsumer:
     def __init__(self):
         self.consumer = KafkaConsumer('bank-customer-events',
                                       bootstrap_servers=['127.0.0.1:9092'],
                                       # auto_offset_reset='earliest',
-                                      enable_auto_commit=True,
+                                      # enable_auto_commit=True,
                                       value_deserializer=lambda m: loads(m.decode('ascii')))
         ## These are two python dictionarys
         # Ledger is the one where all the transaction get posted
@@ -19,16 +18,8 @@ class XactionConsumer:
         # THE PROBLEM is every time we re-run the Consumer, ALL our customer
         # data gets lost!
         # add a way to connect to your database here.
-
-        self.connection = engine.connect()
-        self.metadata = db.MetaData()
-        self.table = db.Table('transaction',
-                              self.metadata,
-                              db.Column('custid', db.Integer()),
-                              db.Column('type', db.String(4)),
-                              db.Column('date', db.Integer()),
-                              db.Column('amt', db.Integer()),
-                              )
+        self.connection = session
+        self.connection.begin()
         # Go back to the readme.
 
     def handleMessages(self):
@@ -37,8 +28,11 @@ class XactionConsumer:
             print('{} received'.format(message))
             self.ledger[message['custid']] = message
             # add message to the transaction table in your SQL using SQLalchemy
-            query = db.insert(self.table).values(message)
-            self.connection.execute(query)  # this is throwing the error
+            # query = db.insert(self.table).values(message)
+            # self.connection.execute(query)
+            new_message = trans_schema.load(message, session=session)
+            self.connection.add(new_message)
+            self.connection.commit()
             if message['custid'] not in self.custBalances:
                 self.custBalances[message['custid']] = 0
             if message['type'] == 'dep':
