@@ -19,7 +19,7 @@ class XactionConsumer:
         # data gets lost!
         # add a way to connect to your database here.
         self.connection = session
-        self.connection.begin()
+
         # Go back to the readme.
 
     def handleMessages(self):
@@ -28,11 +28,11 @@ class XactionConsumer:
             print('{} received'.format(message))
             self.ledger[message['custid']] = message
             # add message to the transaction table in your SQL using SQLalchemy
-            # query = db.insert(self.table).values(message)
-            # self.connection.execute(query)
+            self.connection.begin()
             new_message = trans_schema.load(message, session=session)
             self.connection.add(new_message)
             self.connection.commit()
+            self.connection.close()
             if message['custid'] not in self.custBalances:
                 self.custBalances[message['custid']] = 0
             if message['type'] == 'dep':
@@ -40,7 +40,8 @@ class XactionConsumer:
             else:
                 self.custBalances[message['custid']] -= message['amt']
             print(self.custBalances)
-        self.connection.close()
+
+
 
 
 if __name__ == "__main__":
