@@ -29,6 +29,7 @@ class Customer(Base):
     createdate = Column(Integer)
     fname = Column(String(250), nullable=False)
     lname = Column(String(250), nullable=False)
+    bankid = Column(Integer)
     transactions = relationship(Transaction, backref="customer")
 
 

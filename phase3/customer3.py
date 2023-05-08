@@ -74,3 +74,4 @@ if __name__ == "__main__":
     c = XactionConsumer(0)  # The id of the partition is located here
     c.handleMessages()
 
+# Since the same database is used, it will end up linking, not going by the bank id

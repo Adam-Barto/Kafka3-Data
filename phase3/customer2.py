@@ -71,6 +71,5 @@ class XactionConsumer:
 
 
 if __name__ == "__main__":
-    c = XactionConsumer(0)  # The id of the partition is located here
+    c = XactionConsumer(2)  # The id of the partition is located here
     c.handleMessages()
-
